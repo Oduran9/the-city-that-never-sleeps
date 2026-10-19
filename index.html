@@ -1,23 +1,67 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
   <title>The City That Never Sleeps</title>
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
   <main>
-    <h1>The City That Never Sleeps</h1>
-    <p>Exploring New York City through 311 noise complaints.</p>
+    <header class="hero">
+      <p class="eyebrow">NYC / AN INTERACTIVE DATA STORY</p>
 
-    <section>
-      <h2>NYC Noise Complaints</h2>
-      <p id="status">Loading NYC Open Data...</p>
-      <div id="results"></div>
+      <h1>The City That<br>Never Sleeps.</h1>
+
+      <p class="subtitle">
+        Every hour, New Yorkers report the sounds
+        of the city. But when does New York
+        actually quiet down?
+      </p>
+
+      <a href="#explore" class="explore-link">
+        Explore the data ↓
+      </a>
+    </header>
+
+    <section id="explore" class="chart-section">
+      <p class="eyebrow">01 / THE RHYTHM OF NYC</p>
+
+      <h2>When Does New York Get Loud?</h2>
+
+      <p class="description">
+        A skyline built from 311 noise complaints.
+        Each building represents one hour of the day.
+        Taller buildings mean more reported complaints.
+      </p>
+
+      <p id="status" aria-live="polite">
+        Loading NYC Open Data...
+      </p>
+
+      <div class="chart-container">
+        <div id="noise-chart"></div>
+      </div>
+
+      <p id="chart-detail" aria-live="polite">
+        Select an hour to explore the data.
+      </p>
+
+      <p class="source">
+        Source: NYC Open Data — 311 Service Requests.
+        The visualization uses records from the previous
+        30 days. Complaints are reports, not actual
+        measurements of sound levels.
+      </p>
     </section>
   </main>
 
+  <!-- Load D3 before our JavaScript -->
+  <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
   <script src="script.js"></script>
 </body>
 </html>
