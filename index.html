@@ -5,24 +5,19 @@
   <meta charset="UTF-8">
   <meta name="viewport"
         content="width=device-width, initial-scale=1.0">
-
   <title>The City That Never Sleeps</title>
   <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
   <main>
     <header class="hero">
       <p class="eyebrow">NYC / AN INTERACTIVE DATA STORY</p>
-
       <h1>The City That<br>Never Sleeps.</h1>
-
       <p class="subtitle">
-        Every hour, New Yorkers report the sounds
-        of the city. But when does New York
-        actually quiet down?
+        New York is famous for being the city that
+        never sleeps. But what do thousands of noise
+        complaints reveal about its daily rhythm?
       </p>
-
       <a href="#explore" class="explore-link">
         Explore the data ↓
       </a>
@@ -30,14 +25,49 @@
 
     <section id="explore" class="chart-section">
       <p class="eyebrow">01 / THE RHYTHM OF NYC</p>
-
-      <h2>When Does New York Get Loud?</h2>
+      <h2>A Skyline of Sound.</h2>
 
       <p class="description">
-        A skyline built from 311 noise complaints.
-        Each building represents one hour of the day.
-        Taller buildings mean more reported complaints.
+        Each building represents one hour.
+        Taller buildings mean more noise complaints.
+        Choose a borough and explore how New York's
+        rhythm changes throughout the day.
       </p>
+
+      <div class="filter-panel">
+        <p class="filter-title">EXPLORE BY BOROUGH</p>
+        <div id="borough-filters" class="borough-buttons">
+          <button class="borough-btn active"
+                  data-borough="ALL">All NYC</button>
+          <button class="borough-btn"
+                  data-borough="MANHATTAN">Manhattan</button>
+          <button class="borough-btn"
+                  data-borough="BROOKLYN">Brooklyn</button>
+          <button class="borough-btn"
+                  data-borough="QUEENS">Queens</button>
+          <button class="borough-btn"
+                  data-borough="BRONX">Bronx</button>
+          <button class="borough-btn"
+                  data-borough="STATEN ISLAND">
+            Staten Island
+          </button>
+        </div>
+      </div>
+
+      <div class="stat-row">
+        <div class="stat">
+          <p class="stat-label">SELECTED AREA</p>
+          <h3 id="selected-borough">All NYC</h3>
+        </div>
+        <div class="stat">
+          <p class="stat-label">NOISE COMPLAINTS</p>
+          <h3 id="total-complaints">—</h3>
+        </div>
+        <div class="stat">
+          <p class="stat-label">PEAK HOUR</p>
+          <h3 id="peak-hour">—</h3>
+        </div>
+      </div>
 
       <p id="status" aria-live="polite">
         Loading NYC Open Data...
@@ -45,6 +75,29 @@
 
       <div class="chart-container">
         <div id="noise-chart"></div>
+
+        <div class="timeline-controls">
+          <div class="time-info">
+            <span class="time-caption">SELECTED HOUR</span>
+            <span id="hour-label">10 PM</span>
+          </div>
+
+          <input id="time-slider"
+                 type="range"
+                 min="0"
+                 max="23"
+                 step="1"
+                 value="22"
+                 aria-label="Select hour of day">
+
+          <div class="slider-labels">
+            <span>12 AM</span>
+            <span>6 AM</span>
+            <span>12 PM</span>
+            <span>6 PM</span>
+            <span>11 PM</span>
+          </div>
+        </div>
       </div>
 
       <p id="chart-detail" aria-live="polite">
@@ -52,15 +105,15 @@
       </p>
 
       <p class="source">
-        Source: NYC Open Data — 311 Service Requests.
-        The visualization uses records from the previous
-        30 days. Complaints are reports, not actual
-        measurements of sound levels.
+        Data source: NYC Open Data, 311 Service Requests
+        from 2020 to Present. The chart covers the
+        previous 30 calendar days. Complaints
+        represent reports, not measured sound levels.
+        Counts are not adjusted for population.
       </p>
     </section>
   </main>
 
-  <!-- Load D3 before our JavaScript -->
   <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
   <script src="script.js"></script>
 </body>
