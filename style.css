@@ -395,3 +395,59 @@ input:focus-visible {
     align-items: flex-start;
   }
 }
+
+/* ==================================
+   NYC MIDNIGHT MAP DESIGN
+================================== */
+
+/* Darken only the street map tiles */
+#nyc-map .leaflet-tile-pane img {
+  filter:
+    invert(1)
+    hue-rotate(180deg)
+    brightness(0.75)
+    contrast(1.15)
+    saturate(0.65);
+}
+
+/* Map background */
+#nyc-map {
+  background: #101b2c;
+  border: 1px solid #344158;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+/* Keep complaint dots vibrant */
+#nyc-map .leaflet-overlay-pane {
+  filter: none;
+}
+
+/* Dark popup */
+#nyc-map .leaflet-popup-content-wrapper,
+#nyc-map .leaflet-popup-tip {
+  background: #192639;
+  color: #ffffff;
+}
+
+/* Popup headings */
+#nyc-map .leaflet-popup-content strong {
+  color: #ffb35c;
+}
+
+/* Map zoom buttons */
+#nyc-map .leaflet-control-zoom a {
+  background: #192639;
+  color: #ffb35c;
+  border-color: #344158;
+}
+
+/* Attribution */
+#nyc-map .leaflet-control-attribution {
+  background: rgba(12, 20, 34, 0.9);
+  color: #d1d9e5;
+}
+
+#nyc-map .leaflet-control-attribution a {
+  color: #ffb35c;
+}
