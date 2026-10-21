@@ -1,4 +1,3 @@
-
 const API_URL =
   "https://data.cityofnewyork.us/resource/erm2-nwe9.json";
 
@@ -22,9 +21,21 @@ const BOROUGH_NAMES = {
 let allData = [];
 let currentBorough = "ALL";
 let selectedHour = 22;
+let selectedDays = 30;
+let skylineRequest = null;
 let chart = null;
 
-// Format an hour like 0 -> 12 AM, 22 -> 10 PM.
+// Make filters available to the map.
+window.NYCStory = {
+  getState: () => ({
+    borough: currentBorough,
+    hour: selectedHour,
+    days: selectedDays,
+    range: getDateRange()
+  })
+};
+
+// Convert hour to AM/PM.
 function formatHour(hour) {
   return new Date(2026, 0, 1, hour)
     .toLocaleTimeString("en-US", {
@@ -33,35 +44,61 @@ function formatHour(hour) {
     });
 }
 
-// Create a date string for NYC data queries.
+// Format dates in YYYY-MM-DD.
 function dateString(date) {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-
-  return `${year}-${month}-${day}`;
+  return date.toISOString().slice(0, 10);
 }
 
-// Get counts by borough and hour from NYC Open Data.
+// Use NYC's calendar date instead of the
+// visitor's local computer time zone.
+function getDateRange() {
+  const todayNYC = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/New_York",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
+  }).formatToParts(new Date());
+
+  const part = type =>
+    todayNYC.find(p => p.type === type).value;
+
+  const end = new Date(Date.UTC(
+    Number(part("year")),
+    Number(part("month")) - 1,
+    Number(part("day"))
+  ));
+
+  const start = new Date(end);
+  start.setUTCDate(start.getUTCDate() - selectedDays);
+
+  return {
+    start: dateString(start),
+    end: dateString(end)
+  };
+}
+
+// Tell the map when filters change.
+function notifyMap() {
+  window.dispatchEvent(
+    new CustomEvent("nyc:filters-changed")
+  );
+}
+
+// Fetch totals by borough and hour.
 async function loadNoiseData() {
   const status = document.getElementById("status");
 
+  if (skylineRequest) skylineRequest.abort();
+
+  const controller = new AbortController();
+  skylineRequest = controller;
+
+  const range = getDateRange();
+
+  status.textContent =
+    `Loading ${selectedDays} days of NYC data...`;
+
   try {
-    const today = new Date();
-
-    // Last 30 completed calendar days, ending yesterday.
-    const end = new Date(
-      today.getFullYear(),
-      today.getMonth(),
-      today.getDate()
-    );
-
-    const start = new Date(end);
-    start.setDate(start.getDate() - 30);
-
-    const startDate = dateString(start);
-    const endDate = dateString(end);
-
     const url = new URL(API_URL);
 
     url.searchParams.set(
@@ -72,8 +109,8 @@ async function loadNoiseData() {
 
     url.searchParams.set(
       "$where",
-      `created_date >= '${startDate}T00:00:00' ` +
-      `AND created_date < '${endDate}T00:00:00' ` +
+      `created_date >= '${range.start}T00:00:00' ` +
+      `AND created_date < '${range.end}T00:00:00' ` +
       "AND complaint_type like 'Noise%' " +
       "AND borough in (" +
       BOROUGHS.map(b => `'${b}'`).join(",") +
@@ -92,18 +129,18 @@ async function loadNoiseData() {
 
     url.searchParams.set("$limit", "200");
 
-    const response = await fetch(url);
+    const response = await fetch(url, {
+      signal: controller.signal
+    });
 
     if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(
-        `API error ${response.status}: ${errorText}`
-      );
+      throw new Error(`API error ${response.status}`);
     }
 
     const rawData = await response.json();
 
-    // Convert API strings to numbers.
+    if (skylineRequest !== controller) return;
+
     allData = rawData.map(row => ({
       borough: row.borough,
       hour: Number(row.hour),
@@ -112,28 +149,30 @@ async function loadNoiseData() {
 
     if (!allData.length) {
       status.textContent =
-        "No noise complaints were found for this period.";
+        "No complaints found for the selected period.";
       return;
     }
 
     status.textContent =
-      `Showing noise complaints from ` +
-      `${startDate} through ${dateString(
-        new Date(end.getTime() - 86400000)
-      )}`;
+      `Reporting period: ${range.start} through ` +
+      `${new Date(
+        new Date(range.end + "T00:00:00Z").getTime()
+        - 86400000
+      ).toISOString().slice(0, 10)} ` +
+      `(${selectedDays} completed days)`;
 
     updateVisualization();
 
   } catch (error) {
-    console.error("NYC Open Data API error:", error);
+    if (error.name === "AbortError") return;
 
+    console.error("NYC API error:", error);
     status.textContent =
-      "Failed to load NYC data. " +
-      "Check the browser console for details.";
+      "Could not load NYC data. Check the console.";
   }
 }
 
-// Get the 24 hourly values for the chosen borough.
+// Get hourly counts for the selected borough.
 function getHourlyData(borough) {
   const hourly = Array.from(
     { length: 24 },
@@ -141,11 +180,11 @@ function getHourlyData(borough) {
   );
 
   allData.forEach(row => {
-    const validBorough =
+    const matches =
       borough === "ALL" || row.borough === borough;
 
     if (
-      validBorough &&
+      matches &&
       Number.isInteger(row.hour) &&
       row.hour >= 0 &&
       row.hour < 24
@@ -157,15 +196,16 @@ function getHourlyData(borough) {
   return hourly;
 }
 
-// Update selected borough, statistics, and chart.
+// Update displayed statistics and skyline.
 function updateVisualization() {
+  if (!allData.length) return;
+
   const data = getHourlyData(currentBorough);
 
   const total = d3.sum(data, d => d.total);
 
   const peak = data.reduce(
-    (max, item) =>
-      item.total > max.total ? item : max,
+    (best, d) => d.total > best.total ? d : best,
     data[0]
   );
 
@@ -179,21 +219,16 @@ function updateVisualization() {
 
   document.getElementById(
     "peak-hour"
-  ).textContent = total > 0
-    ? formatHour(peak.hour)
-    : "—";
+  ).textContent =
+    total ? formatHour(peak.hour) : "—";
 
-  if (!chart) {
-    chart = createChart();
-  }
+  if (!chart) chart = createChart();
 
-  // Recalculate heights and transition to new data.
   chart.update(data);
-
   updateSelectedHour(data);
 }
 
-// Update highlighted building and displayed data.
+// Update hour label and highlighted building.
 function updateSelectedHour(data) {
   const selected = data[selectedHour];
 
@@ -212,12 +247,10 @@ function updateSelectedHour(data) {
     "time-slider"
   ).value = selectedHour;
 
-  if (chart) {
-    chart.highlight(selectedHour);
-  }
+  if (chart) chart.highlight(selectedHour);
 }
 
-// Construct the skyline chart.
+// Create the animated skyscraper chart.
 function createChart() {
   const width = 1000;
   const height = 440;
@@ -229,6 +262,8 @@ function createChart() {
     left: 75
   };
 
+  const baseline = height - margin.bottom;
+
   const container = d3.select("#noise-chart");
   container.selectAll("*").remove();
 
@@ -237,7 +272,7 @@ function createChart() {
     .attr("role", "img")
     .attr(
       "aria-label",
-      "NYC skyline chart of hourly noise complaint counts"
+      "Skyscrapers representing hourly NYC noise reports"
     );
 
   const x = d3.scaleBand()
@@ -246,31 +281,23 @@ function createChart() {
     .padding(0.12);
 
   const y = d3.scaleLinear()
-    .range([height - margin.bottom, margin.top]);
-
-  const baseline = height - margin.bottom;
+    .range([baseline, margin.top]);
 
   const grid = svg.append("g");
   const buildingsLayer = svg.append("g");
 
   const yAxis = svg.append("g")
     .attr("class", "axis")
-    .attr(
-      "transform",
-      `translate(${margin.left},0)`
-    );
+    .attr("transform", `translate(${margin.left},0)`);
 
+  // Horizontal hour labels.
   svg.append("g")
     .attr("class", "axis")
-    .attr(
-      "transform",
-      `translate(0,${baseline})`
-    )
+    .attr("transform", `translate(0,${baseline})`)
     .call(
       d3.axisBottom(x)
         .tickValues([
-          0, 3, 6, 9,
-          12, 15, 18, 21
+          0, 3, 6, 9, 12, 15, 18, 21
         ])
         .tickFormat(formatHour)
     );
@@ -284,41 +311,28 @@ function createChart() {
 
   let currentData = [];
 
-  function highlight(hour) {
-    buildingsLayer.selectAll(".building")
-      .select(".building-body")
-      .attr("fill", d =>
-        d.hour === hour ? "#efaa55" : "#344e73"
-      );
-
-    buildingsLayer.selectAll(".building")
-      .select(".building-roof")
-      .attr("fill", d =>
-        d.hour === hour ? "#efaa55" : "#344e73"
-      );
-  }
-
-  // Draw different rooftop shapes.
-  function roofPath(d, index) {
+  // Different rooftop styles.
+  function roofPath(d) {
     if (d.total === 0) return "";
 
     const w = x.bandwidth();
     const top = y(d.total);
+    const i = d.hour;
 
-    if (index % 4 === 0) {
+    if (i % 4 === 0) {
       return `M 0 ${top}
               L ${w / 2} ${top - 9}
               L ${w} ${top} Z`;
     }
 
-    if (index % 4 === 1) {
-      return `M ${w * 0.25} ${top}
-              L ${w * 0.25} ${top - 9}
-              L ${w * 0.75} ${top - 9}
-              L ${w * 0.75} ${top} Z`;
+    if (i % 4 === 1) {
+      return `M ${w * .25} ${top}
+              L ${w * .25} ${top - 9}
+              L ${w * .75} ${top - 9}
+              L ${w * .75} ${top} Z`;
     }
 
-    if (index % 4 === 2) {
+    if (i % 4 === 2) {
       return `M ${w / 2 - 1} ${top}
               L ${w / 2 - 1} ${top - 15}
               L ${w / 2 + 1} ${top - 15}
@@ -328,22 +342,20 @@ function createChart() {
     return "";
   }
 
-  // Draw illuminated windows.
+  // Illuminate individual windows.
   function drawWindows(group, d) {
     const layer = d3.select(group);
     layer.selectAll("*").remove();
 
-    const h = baseline - y(d.total);
-    const w = x.bandwidth();
+    const buildingHeight = baseline - y(d.total);
+    const buildingWidth = x.bandwidth();
 
     const rows = Math.max(
-      0,
-      Math.floor((h - 10) / 13)
+      0, Math.floor((buildingHeight - 10) / 13)
     );
 
     const cols = Math.max(
-      1,
-      Math.floor((w - 8) / 9)
+      1, Math.floor((buildingWidth - 8) / 9)
     );
 
     for (let row = 0; row < rows; row++) {
@@ -365,6 +377,22 @@ function createChart() {
     }
   }
 
+  // Highlight the chosen hour.
+  function highlight(hour) {
+    buildingsLayer.selectAll(".building")
+      .select(".building-body")
+      .attr("fill", d =>
+        d.hour === hour ? "#efaa55" : "#344e73"
+      );
+
+    buildingsLayer.selectAll(".building")
+      .select(".building-roof")
+      .attr("fill", d =>
+        d.hour === hour ? "#efaa55" : "#344e73"
+      );
+  }
+
+  // Update all 24 buildings.
   function update(data) {
     currentData = data;
 
@@ -373,25 +401,22 @@ function createChart() {
       d3.max(data, d => d.total) || 1
     ]).nice();
 
-    const t = svg.transition()
+    const transition = svg.transition()
       .duration(750)
       .ease(d3.easeCubicInOut);
 
-    // Update horizontal grid.
-    const ticks = y.ticks(5);
-
     grid.selectAll("line")
-      .data(ticks)
+      .data(y.ticks(5))
       .join("line")
       .attr("stroke", "#344158")
       .attr("stroke-opacity", 0.5)
       .attr("x1", margin.left)
       .attr("x2", width - margin.right)
-      .transition(t)
+      .transition(transition)
       .attr("y1", d => y(d))
       .attr("y2", d => y(d));
 
-    yAxis.transition(t)
+    yAxis.transition(transition)
       .call(
         d3.axisLeft(y)
           .ticks(5)
@@ -433,38 +458,48 @@ function createChart() {
     );
 
     buildings.select(".building-body")
-      .transition(t)
+      .interrupt()
+      .transition()
+      .duration(750)
       .attr("y", d => y(d.total))
       .attr("height", d => baseline - y(d.total));
 
     buildings.select(".building-roof")
-      .transition(t)
-      .attr("d", (d, i) => roofPath(d, i));
+      .interrupt()
+      .transition()
+      .duration(750)
+      .attr("d", roofPath);
 
-    // Hide windows during the resize animation.
     buildings.select(".building-windows")
+      .interrupt()
       .attr("opacity", 0);
 
-    t.end().then(() => {
+    // Rebuild windows once buildings finish resizing.
+    setTimeout(() => {
+      if (currentData !== data) return;
+
       buildings.select(".building-windows")
         .each(function(d) {
           drawWindows(this, d);
         })
         .transition()
-        .duration(300)
+        .duration(250)
         .attr("opacity", 1);
-    }).catch(() => {
-      // A newer borough selection interrupted animation.
-    });
+    }, 780);
 
-    buildings.on("click", (_, d) => {
+    // Clicking a building selects its hour.
+    function selectBuilding(d) {
       selectedHour = d.hour;
       updateSelectedHour(currentData);
+      notifyMap();
+    }
+
+    buildings.on("click", (_, d) => {
+      selectBuilding(d);
     });
 
     buildings.on("mouseover", (_, d) => {
-      selectedHour = d.hour;
-      updateSelectedHour(currentData);
+      selectBuilding(d);
     });
 
     buildings.on("keydown", (event, d) => {
@@ -473,8 +508,7 @@ function createChart() {
         event.key === " "
       ) {
         event.preventDefault();
-        selectedHour = d.hour;
-        updateSelectedHour(currentData);
+        selectBuilding(d);
       }
     });
 
@@ -484,12 +518,10 @@ function createChart() {
   return { update, highlight };
 }
 
-// Borough button events.
+// BOROUGH SELECTOR
 document.querySelectorAll(".borough-btn")
   .forEach(button => {
     button.addEventListener("click", () => {
-      if (!allData.length) return;
-
       currentBorough = button.dataset.borough;
 
       document.querySelectorAll(".borough-btn")
@@ -501,10 +533,31 @@ document.querySelectorAll(".borough-btn")
         });
 
       updateVisualization();
+      notifyMap();
     });
   });
 
-// Slider interaction.
+// TIME PERIOD SELECTOR
+document.querySelectorAll(".period-btn")
+  .forEach(button => {
+    button.addEventListener("click", () => {
+      selectedDays = Number(button.dataset.days);
+
+      document.querySelectorAll(".period-btn")
+        .forEach(btn => {
+          btn.classList.toggle(
+            "active",
+            btn === button
+          );
+        });
+
+      // Both visualizations get the new time period.
+      notifyMap();
+      loadNoiseData();
+    });
+  });
+
+// HOUR SLIDER
 document.getElementById("time-slider")
   .addEventListener("input", event => {
     selectedHour = Number(event.target.value);
@@ -514,7 +567,9 @@ document.getElementById("time-slider")
         getHourlyData(currentBorough)
       );
     }
+
+    notifyMap();
   });
 
-// Start the application.
+// Load initial NYC data.
 loadNoiseData();

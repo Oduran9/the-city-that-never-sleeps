@@ -1,95 +1,203 @@
-
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport"
         content="width=device-width, initial-scale=1.0">
+
   <title>The City That Never Sleeps</title>
+
   <link rel="stylesheet" href="style.css">
+
+  <!-- Leaflet map styling -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  >
 </head>
+
 <body>
+
   <main>
+
+    <!-- SECTION 00: INTRODUCTION -->
     <header class="hero">
-      <p class="eyebrow">NYC / AN INTERACTIVE DATA STORY</p>
-      <h1>The City That<br>Never Sleeps.</h1>
-      <p class="subtitle">
-        New York is known for it's signature stank, the timbs, 
-        the puffa, and for being the city that never sleeps. 
-        Let's see what thousands of noise complaints reveal 
-        about New Yorks' daily rhythm.
+
+      <p class="eyebrow">
+        NYC / AN INTERACTIVE DATA STORY
       </p>
+
+      <h1>
+        The City That<br>
+        Never Sleeps.
+      </h1>
+
+      <p class="subtitle">
+        New York is famous for being the city
+        that never sleeps. From late-night music
+        to early-morning construction, the city
+        is constantly making noise.
+
+        But what do the actual complaints reveal
+        about New York's daily rhythm?
+      </p>
+
       <a href="#explore" class="explore-link">
         Explore the data ↓
       </a>
+
     </header>
 
+
+    <!-- SECTION 01: SKYLINE -->
     <section id="explore" class="chart-section">
-      <p class="eyebrow">01 / THE RHYTHM OF NYC</p>
+
+      <p class="eyebrow">
+        01 / THE RHYTHM OF NYC
+      </p>
+
       <h2>A Skyline of Sound.</h2>
 
       <p class="description">
-        Each building represents one hour.
-        Taller buildings mean more noise complaints.
-        You can also pick a borough and explore how New York's
-        rhythm changes throughout the day. 
+        Each building represents one hour of the day.
+        Taller buildings represent more reported
+        noise complaints.
+
+        Select a time period and borough to explore
+        how New York's rhythm changes.
       </p>
 
+
+      <!-- TIME PERIOD SELECTOR -->
       <div class="filter-panel">
-        <p class="filter-title">EXPLORE BY BOROUGH</p>
-        <div id="borough-filters" class="borough-buttons">
+
+        <p class="filter-title">
+          SELECT TIME PERIOD
+        </p>
+
+        <div class="filter-buttons" id="period-filters">
+
+          <button class="period-btn"
+                  data-days="7">
+            7 Days
+          </button>
+
+          <button class="period-btn active"
+                  data-days="30">
+            30 Days
+          </button>
+
+          <button class="period-btn"
+                  data-days="90">
+            90 Days
+          </button>
+
+          <button class="period-btn"
+                  data-days="365">
+            1 Year
+          </button>
+
+        </div>
+
+      </div>
+
+
+      <!-- BOROUGH SELECTOR -->
+      <div class="filter-panel">
+
+        <p class="filter-title">
+          EXPLORE BY BOROUGH
+        </p>
+
+        <div class="filter-buttons" id="borough-filters">
+
           <button class="borough-btn active"
-                  data-borough="ALL">All NYC</button>
+                  data-borough="ALL">
+            All NYC
+          </button>
+
           <button class="borough-btn"
-                  data-borough="MANHATTAN">Manhattan</button>
+                  data-borough="MANHATTAN">
+            Manhattan
+          </button>
+
           <button class="borough-btn"
-                  data-borough="BROOKLYN">Brooklyn</button>
+                  data-borough="BROOKLYN">
+            Brooklyn
+          </button>
+
           <button class="borough-btn"
-                  data-borough="QUEENS">Queens</button>
+                  data-borough="QUEENS">
+            Queens
+          </button>
+
           <button class="borough-btn"
-                  data-borough="BRONX">Bronx</button>
+                  data-borough="BRONX">
+            Bronx
+          </button>
+
           <button class="borough-btn"
                   data-borough="STATEN ISLAND">
             Staten Island
           </button>
+
         </div>
+
       </div>
 
+
+      <!-- STATISTICS -->
       <div class="stat-row">
+
         <div class="stat">
           <p class="stat-label">SELECTED AREA</p>
           <h3 id="selected-borough">All NYC</h3>
         </div>
+
         <div class="stat">
           <p class="stat-label">NOISE COMPLAINTS</p>
           <h3 id="total-complaints">—</h3>
         </div>
+
         <div class="stat">
           <p class="stat-label">PEAK HOUR</p>
           <h3 id="peak-hour">—</h3>
         </div>
+
       </div>
 
+
+      <!-- SKYLINE VISUALIZATION -->
       <p id="status" aria-live="polite">
         Loading NYC Open Data...
       </p>
 
       <div class="chart-container">
+
         <div id="noise-chart"></div>
 
         <div class="timeline-controls">
+
           <div class="time-info">
-            <span class="time-caption">SELECTED HOUR</span>
-            <span id="hour-label">10 PM</span>
+            <span class="time-caption">
+              SELECTED HOUR
+            </span>
+
+            <span id="hour-label">
+              10 PM
+            </span>
           </div>
 
-          <input id="time-slider"
-                 type="range"
-                 min="0"
-                 max="23"
-                 step="1"
-                 value="22"
-                 aria-label="Select hour of day">
+          <input
+            id="time-slider"
+            type="range"
+            min="0"
+            max="23"
+            step="1"
+            value="22"
+            aria-label="Select hour of day"
+          >
 
           <div class="slider-labels">
             <span>12 AM</span>
@@ -98,24 +206,118 @@
             <span>6 PM</span>
             <span>11 PM</span>
           </div>
+
         </div>
+
       </div>
 
+
       <p id="chart-detail" aria-live="polite">
-        Select an hour to explore the data.
+        Select an hour to explore noise complaints.
       </p>
 
       <p class="source">
-        Data source: NYC Open Data, 311 Service Requests
-        from 2020 to Present. The chart covers the
-        previous 30 calendar days. Complaints
-        represent reports, not measured sound levels.
-        Counts are not adjusted for population.
+        Source: NYC Open Data — 311 Service Requests.
+        The visualization uses the selected reporting
+        period. Complaint counts represent reports
+        rather than actual measurements of noise.
       </p>
+
     </section>
+
+
+    <!-- SECTION 02: INTERACTIVE MAP -->
+    <section id="map-section" class="chart-section">
+
+      <p class="eyebrow">
+        02 / THE GEOGRAPHY OF NOISE
+      </p>
+
+      <h2>Mapping the Noise.</h2>
+
+      <p class="description">
+        Where are New Yorkers reporting noise?
+
+        Explore actual 311 complaint locations
+        across the five boroughs.
+
+        The map responds to the borough, time
+        period, and hour selected in the
+        skyline above.
+      </p>
+
+
+      <div class="map-heading">
+
+        <div>
+          <p class="filter-title">
+            CURRENT MAP VIEW
+          </p>
+
+          <h3 id="map-selection">
+            All NYC / 30 Days / 10 PM
+          </h3>
+        </div>
+
+        <button id="reset-map" class="reset-btn">
+          Reset Map View
+        </button>
+
+      </div>
+
+
+      <!-- LEAFLET MAP -->
+      <div id="nyc-map"></div>
+
+      <p id="map-status" aria-live="polite">
+        Loading complaint locations...
+      </p>
+
+      <p class="source">
+        Map points represent individual geolocated
+        311 reports. A maximum of 300 recent
+        matching records is displayed at one time.
+        The map is a sample of the selected period,
+        not a complete distribution or measurement
+        of sound levels.
+      </p>
+
+    </section>
+
+
+    <!-- WEBSITE FOOTER -->
+    <footer class="site-footer">
+
+      <p>The City That Never Sleeps</p>
+
+      <span>
+        An interactive NYC Open Data story
+      </span>
+
+      <a
+        href="https://opendata.cityofnewyork.us/"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Explore NYC Open Data ↗
+      </a>
+
+    </footer>
+
   </main>
 
+
+  <!-- D3.js visualization library -->
   <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+
+  <!-- Leaflet interactive mapping library -->
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
+  </script>
+
+  <!-- Website JavaScript -->
   <script src="script.js"></script>
+  <script src="map.js"></script>
+
 </body>
 </html>

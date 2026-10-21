@@ -1,4 +1,3 @@
-
 :root {
   --background: #0c1422;
   --surface: #192639;
@@ -29,7 +28,7 @@ main {
   padding: 0 28px;
 }
 
-/* HERO */
+/* INTRODUCTION */
 
 .hero {
   min-height: 90vh;
@@ -40,6 +39,7 @@ main {
 
 .eyebrow {
   color: var(--accent);
+  text-transform: uppercase;
   letter-spacing: 3px;
   font-size: 12px;
   font-weight: bold;
@@ -53,10 +53,11 @@ h1 {
 }
 
 .subtitle {
-  max-width: 580px;
+  max-width: 630px;
   font-size: 20px;
   line-height: 1.7;
   color: var(--muted);
+  white-space: pre-line;
 }
 
 .explore-link {
@@ -64,9 +65,14 @@ h1 {
   color: var(--accent);
   text-decoration: none;
   font-weight: bold;
+  width: fit-content;
 }
 
-/* VISUALIZATION SECTION */
+.explore-link:hover {
+  text-decoration: underline;
+}
+
+/* SECTIONS */
 
 .chart-section {
   padding: 75px 0 110px;
@@ -81,14 +87,15 @@ h2 {
 .description {
   color: var(--muted);
   font-size: 17px;
-  line-height: 1.6;
+  line-height: 1.7;
   max-width: 750px;
+  white-space: pre-line;
 }
 
-/* BOROUGH SELECTOR */
+/* FILTER BUTTONS */
 
 .filter-panel {
-  margin-top: 40px;
+  margin-top: 38px;
 }
 
 .filter-title,
@@ -100,14 +107,16 @@ h2 {
   font-weight: bold;
 }
 
-.borough-buttons {
+.filter-buttons {
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
   margin-top: 18px;
 }
 
-.borough-btn {
+.borough-btn,
+.period-btn,
+.reset-btn {
   padding: 12px 18px;
   border: 1px solid var(--border);
   border-radius: 7px;
@@ -115,22 +124,29 @@ h2 {
   color: var(--muted);
   font-size: 14px;
   cursor: pointer;
-  transition: 0.2s ease;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
 }
 
-.borough-btn:hover {
+.borough-btn:hover,
+.period-btn:hover,
+.reset-btn:hover {
   border-color: var(--accent);
   color: white;
 }
 
-.borough-btn.active {
+.borough-btn.active,
+.period-btn.active {
   background: var(--accent);
   color: #142033;
   border-color: var(--accent);
   font-weight: bold;
 }
 
-.borough-btn:focus-visible {
+button:focus-visible,
+input:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 3px;
 }
@@ -160,9 +176,10 @@ h2 {
   color: var(--accent);
   margin-top: 25px;
   min-height: 20px;
+  line-height: 1.5;
 }
 
-/* SKYLINE */
+/* SKYLINE CHART */
 
 .chart-container {
   margin-top: 20px;
@@ -247,7 +264,84 @@ h2 {
   margin-top: 35px;
 }
 
-/* MOBILE */
+/* INTERACTIVE MAP */
+
+.map-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-top: 35px;
+  margin-bottom: 20px;
+}
+
+.map-heading h3 {
+  font-size: 22px;
+  margin: 10px 0;
+}
+
+#nyc-map {
+  width: 100%;
+  height: 560px;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  z-index: 1;
+}
+
+#map-status {
+  color: var(--accent);
+  margin-top: 18px;
+  line-height: 1.6;
+}
+
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+  background: var(--surface);
+  color: var(--text);
+}
+
+.leaflet-popup-content strong {
+  color: var(--accent);
+}
+
+.leaflet-container a.leaflet-popup-close-button {
+  color: var(--accent);
+}
+
+.leaflet-container {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* FOOTER */
+
+.site-footer {
+  border-top: 1px solid var(--border);
+  padding: 40px 0 60px;
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.site-footer p {
+  font-weight: bold;
+}
+
+.site-footer span {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.site-footer a {
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 13px;
+}
+
+/* MOBILE DESIGN */
 
 @media (max-width: 650px) {
   .hero {
@@ -258,6 +352,10 @@ h2 {
     letter-spacing: -2px;
   }
 
+  .subtitle {
+    font-size: 17px;
+  }
+
   .stat-row {
     grid-template-columns: 1fr;
   }
@@ -266,7 +364,8 @@ h2 {
     padding: 15px;
   }
 
-  .borough-btn {
+  .borough-btn,
+  .period-btn {
     font-size: 12px;
     padding: 10px 12px;
   }
@@ -285,5 +384,14 @@ h2 {
 
   .slider-labels {
     font-size: 10px;
+  }
+
+  #nyc-map {
+    height: 400px;
+  }
+
+  .site-footer {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }
