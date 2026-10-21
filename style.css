@@ -1,3 +1,9 @@
+
+/* ==========================================
+   THE CITY THAT NEVER SLEEPS
+   MAIN WEBSITE STYLING
+========================================== */
+
 :root {
   --background: #0c1422;
   --surface: #192639;
@@ -28,7 +34,9 @@ main {
   padding: 0 28px;
 }
 
-/* INTRODUCTION */
+/* ==========================================
+   INTRODUCTION / HERO
+========================================== */
 
 .hero {
   min-height: 90vh;
@@ -72,7 +80,9 @@ h1 {
   text-decoration: underline;
 }
 
-/* SECTIONS */
+/* ==========================================
+   MAIN SECTIONS
+========================================== */
 
 .chart-section {
   padding: 75px 0 110px;
@@ -92,7 +102,9 @@ h2 {
   white-space: pre-line;
 }
 
-/* FILTER BUTTONS */
+/* ==========================================
+   TIME PERIOD AND BOROUGH FILTERS
+========================================== */
 
 .filter-panel {
   margin-top: 38px;
@@ -151,7 +163,9 @@ input:focus-visible {
   outline-offset: 3px;
 }
 
-/* STATISTICS */
+/* ==========================================
+   STATISTICS
+========================================== */
 
 .stat-row {
   display: grid;
@@ -179,7 +193,9 @@ input:focus-visible {
   line-height: 1.5;
 }
 
-/* SKYLINE CHART */
+/* ==========================================
+   SKYLINE VISUALIZATION
+========================================== */
 
 .chart-container {
   margin-top: 20px;
@@ -216,7 +232,9 @@ input:focus-visible {
   stroke: #40506a;
 }
 
-/* TIME SLIDER */
+/* ==========================================
+   HOUR SLIDER
+========================================== */
 
 .timeline-controls {
   margin: 25px 20px 10px;
@@ -264,7 +282,9 @@ input:focus-visible {
   margin-top: 35px;
 }
 
-/* INTERACTIVE MAP */
+/* ==========================================
+   INTERACTIVE NYC MAP
+========================================== */
 
 .map-heading {
   display: flex;
@@ -281,13 +301,79 @@ input:focus-visible {
   margin: 10px 0;
 }
 
+/* Keep the normal, readable OpenStreetMap
+   background. No inverted color filters. */
+
 #nyc-map {
   width: 100%;
   height: 560px;
   border-radius: 16px;
-  border: 1px solid var(--border);
-  background: var(--surface);
+  border: 2px solid #42536d;
+  background: #e6ebef;
+  overflow: hidden;
   z-index: 1;
+}
+
+/* Improve marker visibility.
+   Actual marker colors also come from map.js. */
+
+#nyc-map .leaflet-interactive {
+  cursor: pointer;
+}
+
+#nyc-map .leaflet-overlay-pane {
+  filter: none;
+}
+
+/* Dark popup cards */
+
+#nyc-map .leaflet-popup-content-wrapper,
+#nyc-map .leaflet-popup-tip {
+  background: #192639;
+  color: #f7f8fb;
+}
+
+#nyc-map .leaflet-popup-content {
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+#nyc-map .leaflet-popup-content strong {
+  color: #ffb35c;
+  font-size: 15px;
+}
+
+#nyc-map .leaflet-container {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+#nyc-map .leaflet-popup-close-button {
+  color: #ffb35c;
+}
+
+/* Zoom controls */
+
+#nyc-map .leaflet-control-zoom a {
+  background: #192639;
+  color: #ffb35c;
+  border-color: #344158;
+}
+
+#nyc-map .leaflet-control-zoom a:hover {
+  background: #2b3b53;
+  color: white;
+}
+
+/* Attribution */
+
+#nyc-map .leaflet-control-attribution {
+  background: rgba(255, 255, 255, 0.92);
+  color: #334155;
+  font-size: 10px;
+}
+
+#nyc-map .leaflet-control-attribution a {
+  color: #245b8f;
 }
 
 #map-status {
@@ -296,25 +382,9 @@ input:focus-visible {
   line-height: 1.6;
 }
 
-.leaflet-popup-content-wrapper,
-.leaflet-popup-tip {
-  background: var(--surface);
-  color: var(--text);
-}
-
-.leaflet-popup-content strong {
-  color: var(--accent);
-}
-
-.leaflet-container a.leaflet-popup-close-button {
-  color: var(--accent);
-}
-
-.leaflet-container {
-  font-family: Arial, Helvetica, sans-serif;
-}
-
-/* FOOTER */
+/* ==========================================
+   FOOTER
+========================================== */
 
 .site-footer {
   border-top: 1px solid var(--border);
@@ -341,7 +411,9 @@ input:focus-visible {
   font-size: 13px;
 }
 
-/* MOBILE DESIGN */
+/* ==========================================
+   RESPONSIVE MOBILE DESIGN
+========================================== */
 
 @media (max-width: 650px) {
   .hero {
@@ -394,72 +466,4 @@ input:focus-visible {
     flex-direction: column;
     align-items: flex-start;
   }
-}
-
-/* ==================================
-   NYC MIDNIGHT MAP DESIGN
-================================== */
-
-/* Darken only the street map tiles */
-#nyc-map .leaflet-tile-pane img {
-  filter:
-    invert(1)
-    hue-rotate(180deg)
-    brightness(0.75)
-    contrast(1.15)
-    saturate(0.65);
-}
-
-/* Map background */
-#nyc-map {
-  background: #101b2c;
-  border: 1px solid #344158;
-  border-radius: 16px;
-  overflow: hidden;
-}
-
-/* Keep complaint dots vibrant */
-#nyc-map .leaflet-overlay-pane {
-  filter: none;
-}
-
-/* Dark popup */
-#nyc-map .leaflet-popup-content-wrapper,
-#nyc-map .leaflet-popup-tip {
-  background: #192639;
-  color: #ffffff;
-}
-
-/* Popup headings */
-#nyc-map .leaflet-popup-content strong {
-  color: #ffb35c;
-}
-
-/* Map zoom buttons */
-#nyc-map .leaflet-control-zoom a {
-  background: #192639;
-  color: #ffb35c;
-  border-color: #344158;
-}
-
-/* Attribution */
-#nyc-map .leaflet-control-attribution {
-  background: rgba(12, 20, 34, 0.9);
-  color: #d1d9e5;
-}
-
-#nyc-map .leaflet-control-attribution a {
-  color: #ffb35c;
-}
-
-/* NYC MIDNIGHT MAP */
-
-#nyc-map .leaflet-tile-pane {
-  filter: invert(100%) hue-rotate(180deg)
-          brightness(75%) contrast(115%)
-          saturate(65%) !important;
-}
-
-#nyc-map {
-  background-color: #0c1422;
 }

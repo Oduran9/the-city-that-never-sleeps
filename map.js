@@ -154,16 +154,19 @@ function addMarker(record) {
     return false;
   }
 
-  const marker = L.circleMarker(
-    [lat, lng],
-    {
-      radius: 5,
-      color: "#ffb35c",
-      fillColor: "#ffb35c",
-      fillOpacity: 0.65,
-      weight: 1
-    }
-  );
+
+const marker = L.circleMarker(
+  [lat, lng],
+  {
+    radius: 7,
+    color: "#ffffff",
+    weight: 2,
+    opacity: 1,
+    fillColor: "#e34b36",
+    fillOpacity: 0.95
+  }
+);
+
 
   marker.bindPopup(createPopup(record));
   marker.addTo(noiseMarkers);
