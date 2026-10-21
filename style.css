@@ -451,3 +451,15 @@ input:focus-visible {
 #nyc-map .leaflet-control-attribution a {
   color: #ffb35c;
 }
+
+/* NYC MIDNIGHT MAP */
+
+#nyc-map .leaflet-tile-pane {
+  filter: invert(100%) hue-rotate(180deg)
+          brightness(75%) contrast(115%)
+          saturate(65%) !important;
+}
+
+#nyc-map {
+  background-color: #0c1422;
+}
