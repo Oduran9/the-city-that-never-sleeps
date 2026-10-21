@@ -44,17 +44,22 @@ const nycMap = L.map("nyc-map", {
   scrollWheelZoom: false
 }).setView([40.7128, -74.0060], 10);
 
-// Add the dark map background.
+
+/* DARK NYC MAP BACKGROUND — CARTO */
+
+const CARTO_KEY = "cb1_4r3f_1_60846215c251f7704951cc8d";
+
 L.tileLayer(
-  "https://{s}.basemaps.cartocdn.com/dark_all/" +
-  "{z}/{x}/{y}{r}.png",
+  "https://basemaps.cartocdn.com/rastertiles/" +
+  "dark_all/{z}/{x}/{y}.png?key=" + CARTO_KEY,
   {
     attribution:
-      "&copy; OpenStreetMap contributors " +
-      "&copy; CARTO",
+      '&copy; OpenStreetMap contributors, ' +
+      '&copy; CARTO',
     maxZoom: 19
   }
 ).addTo(nycMap);
+
 
 // Layer containing our noise complaint points.
 const noiseMarkers = L.layerGroup().addTo(nycMap);
