@@ -47,18 +47,17 @@ const nycMap = L.map("nyc-map", {
 
 /* DARK NYC MAP BACKGROUND — CARTO */
 
-const CARTO_KEY = "cb1_4r3f_1_60846215c251f7704951cc8d";
+
+/* TEMPORARY MAP BACKGROUND TEST */
 
 L.tileLayer(
-  "https://basemaps.cartocdn.com/rastertiles/" +
-  "dark_all/{z}/{x}/{y}.png?key=" + CARTO_KEY,
+  "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
   {
-    attribution:
-      '&copy; OpenStreetMap contributors, ' +
-      '&copy; CARTO',
+    attribution: "&copy; OpenStreetMap contributors",
     maxZoom: 19
   }
 ).addTo(nycMap);
+
 
 
 // Layer containing our noise complaint points.
