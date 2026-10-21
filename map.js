@@ -162,8 +162,8 @@ const marker = L.circleMarker(
     color: "#ffffff",
     weight: 2,
     opacity: 1,
-    fillColor: "#e34b36",
-    fillOpacity: 0.95
+    fillColor: "#d03420",
+    fillOpacity: 1
   }
 );
 
