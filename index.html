@@ -1,111 +1,345 @@
+
 <!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#0c1422">
+
   <title>The City That Never Sleeps | An NYC Open Data Story</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
+  <link rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
   <main>
+
+    <!-- INTRODUCTION -->
     <header class="hero" id="top">
       <p class="eyebrow">NYC / AN INTERACTIVE DATA STORY</p>
+
       <h1>The City That<br>Never Sleeps.</h1>
-      <p class="hero-tagline">What does the city sound like to the people trying to sleep in it?</p>
-      <p class="subtitle">New York celebrates its round-the-clock energy. But behind the nightlife, traffic, and construction are people filing noise complaints. Follow those reports across time and space—and consider whose version of the city they represent.</p>
-      <a class="explore-link" href="#explore">Explore the story ↓</a>
+
+      <p class="hero-tagline">
+        What does the city sound like to the people trying
+        to sleep in it?
+      </p>
+
+      <p class="subtitle">
+        New York celebrates its round-the-clock energy.
+        But behind the nightlife, traffic, and construction
+        are people filing noise complaints. Follow those
+        reports across time and space—and consider whose
+        version of the city they represent.
+      </p>
+
+      <a class="explore-link" href="#explore">
+        Explore the story ↓
+      </a>
     </header>
 
+
+    <!-- CHAPTER 01: SKYLINE -->
     <section class="chapter" id="explore">
       <p class="eyebrow">01 / WHEN THE CITY SPEAKS UP</p>
       <h2>A Skyline of Sound.</h2>
-      <p class="description">Each building stands for one hour of the day. Its height represents how many noise-related 311 requests were filed during that hour across the selected reporting period. Pick a borough or move through time.</p>
+
+      <p class="description">
+        Each building stands for one hour of the day.
+        Its height represents how many noise-related
+        311 requests were filed during that hour across
+        the selected reporting period. Pick a borough
+        or move through time.
+      </p>
 
       <div class="filter-panel">
         <p class="filter-title">REPORTING PERIOD</p>
+
         <div class="filter-buttons" id="period-filters">
-          <button type="button" class="period-btn" data-days="7">7 days</button>
-          <button type="button" class="period-btn active" data-days="30">30 days</button>
-          <button type="button" class="period-btn" data-days="90">90 days</button>
-          <button type="button" class="period-btn" data-days="365">1 year</button>
+          <button type="button" class="period-btn"
+            data-days="7">7 days</button>
+          <button type="button" class="period-btn active"
+            data-days="30">30 days</button>
+          <button type="button" class="period-btn"
+            data-days="90">90 days</button>
+          <button type="button" class="period-btn"
+            data-days="365">1 year</button>
         </div>
       </div>
+
       <div class="filter-panel">
         <p class="filter-title">BOROUGH</p>
+
         <div class="filter-buttons" id="borough-filters">
-          <button type="button" class="borough-btn active" data-borough="ALL">All NYC</button>
-          <button type="button" class="borough-btn" data-borough="MANHATTAN">Manhattan</button>
-          <button type="button" class="borough-btn" data-borough="BROOKLYN">Brooklyn</button>
-          <button type="button" class="borough-btn" data-borough="QUEENS">Queens</button>
-          <button type="button" class="borough-btn" data-borough="BRONX">Bronx</button>
-          <button type="button" class="borough-btn" data-borough="STATEN ISLAND">Staten Island</button>
+          <button type="button" class="borough-btn active"
+            data-borough="ALL">All NYC</button>
+
+          <button type="button" class="borough-btn"
+            data-borough="MANHATTAN">Manhattan</button>
+
+          <button type="button" class="borough-btn"
+            data-borough="BROOKLYN">Brooklyn</button>
+
+          <button type="button" class="borough-btn"
+            data-borough="QUEENS">Queens</button>
+
+          <button type="button" class="borough-btn"
+            data-borough="BRONX">Bronx</button>
+
+          <button type="button" class="borough-btn"
+            data-borough="STATEN ISLAND">Staten Island</button>
         </div>
       </div>
+
       <div class="stat-row">
-        <div class="stat"><p class="stat-label">SELECTED AREA</p><h3 id="selected-borough">All NYC</h3></div>
-        <div class="stat"><p class="stat-label">COMPLAINTS</p><h3 id="total-complaints">—</h3></div>
-        <div class="stat"><p class="stat-label">MOST REPORTED HOUR</p><h3 id="peak-hour">—</h3></div>
+        <div class="stat">
+          <p class="stat-label">SELECTED AREA</p>
+          <h3 id="selected-borough">All NYC</h3>
+        </div>
+
+        <div class="stat">
+          <p class="stat-label">COMPLAINTS</p>
+          <h3 id="total-complaints">—</h3>
+        </div>
+
+        <div class="stat">
+          <p class="stat-label">MOST REPORTED HOUR</p>
+          <h3 id="peak-hour">—</h3>
+        </div>
       </div>
-      <p class="status" id="status" aria-live="polite">Loading NYC Open Data…</p>
+
+      <p class="status" id="status" aria-live="polite">
+        Loading NYC Open Data…
+      </p>
+
       <div class="visualization-card">
         <div id="noise-chart"></div>
+
         <div class="timeline-controls">
-          <div class="time-info"><span class="filter-title">SELECTED HOUR</span><strong id="hour-label">10 PM</strong></div>
-          <input id="time-slider" type="range" min="0" max="23" value="22" step="1" aria-label="Select hour of day">
-          <div class="slider-labels"><span>12 AM</span><span>6 AM</span><span>12 PM</span><span>6 PM</span><span>11 PM</span></div>
+          <div class="time-info">
+            <span class="filter-title">SELECTED HOUR</span>
+            <strong id="hour-label">10 PM</strong>
+          </div>
+
+          <input
+            id="time-slider"
+            type="range"
+            min="0"
+            max="23"
+            value="22"
+            step="1"
+            aria-label="Select hour of day"
+          >
+
+          <div class="slider-labels">
+            <span>12 AM</span>
+            <span>6 AM</span>
+            <span>12 PM</span>
+            <span>6 PM</span>
+            <span>11 PM</span>
+          </div>
         </div>
       </div>
-      <p class="insight" id="chart-detail">Select an hour to explore.</p>
-      <p class="source">Data: NYC 311 Service Requests. Records are grouped by submission hour in New York local time. Counts reflect complaints, not decibel readings or unique people. The most recent completed day is yesterday.</p>
+
+      <p class="insight" id="chart-detail">
+        Select an hour to explore.
+      </p>
+
+      <p class="source">
+        Data: NYC 311 Service Requests. Records are grouped
+        by submission hour in New York local time. Counts
+        reflect complaints, not decibel readings or unique
+        people. The most recent completed day is yesterday.
+      </p>
     </section>
 
+
+    <!-- CHAPTER 02: INTERACTIVE MAP -->
     <section class="chapter" id="geography">
       <p class="eyebrow">02 / WHERE THE CITY SPEAKS UP</p>
       <h2>Mapping the Noise.</h2>
-      <p class="description">Where do these reports come from? Explore a subset of complaint locations. This map responds to the period, borough, and hour selected above.</p>
-      <div class="map-heading"><div><p class="filter-title">CURRENT VIEW</p><h3 id="map-selection">All NYC / 30 days / 10 PM</h3></div><button type="button" id="reset-map" class="reset-btn">Reset map view</button></div>
-      <div id="nyc-map" aria-label="Interactive map of noise complaints in New York City"></div>
-      <p class="status" id="map-status" aria-live="polite">Loading map locations…</p>
-      <p class="source">Red markers show up to 300 of the most recently filed matching geolocated reports. This is <strong>not</strong> a comprehensive heatmap, and differences in visible dot density should not be interpreted as neighborhood rankings. Coordinates may be approximate or absent.</p>
+
+      <p class="description">
+        Where do these reports come from? Explore a subset
+        of complaint locations. This map responds to the
+        period, borough, and hour selected above.
+      </p>
+
+      <div class="map-heading">
+        <div>
+          <p class="filter-title">CURRENT VIEW</p>
+          <h3 id="map-selection">
+            All NYC / 30 days / 10 PM
+          </h3>
+        </div>
+
+        <button type="button" id="reset-map"
+          class="reset-btn">
+          Reset map view
+        </button>
+      </div>
+
+      <div
+        id="nyc-map"
+        aria-label="Interactive map of noise complaints in New York City">
+      </div>
+
+      <p class="status" id="map-status" aria-live="polite">
+        Loading map locations…
+      </p>
+
+      <p class="source">
+        Red markers show up to 300 of the most recently
+        filed matching geolocated reports. This is
+        <strong>not</strong> a comprehensive heatmap, and
+        differences in visible dot density should not be
+        interpreted as neighborhood rankings. Coordinates
+        may be approximate or absent.
+      </p>
     </section>
 
+
+    <!-- CHAPTER 03: WEEKDAYS VS WEEKENDS -->
     <section class="chapter" id="weekends">
       <p class="eyebrow">03 / THE WEEKLY RHYTHM</p>
+
       <h2>Does the City Take Weekends Off?</h2>
-      <p class="description">Weekdays outnumber weekend days, so raw totals can be misleading. Here, we compare the <strong>average number of reported complaints per weekday versus per weekend day</strong> across the selected period and borough.</p>
-      <p class="status" id="week-status" aria-live="polite">Loading weekday/weekend data…</p>
-      <div class="visualization-card"><div id="week-chart" role="img" aria-label="Weekday versus weekend average daily complaint comparison"></div></div>
+
+      <p class="description">
+        Weekdays outnumber weekend days, so raw totals
+        can be misleading. Here, we compare the
+        <strong>average number of reported complaints per
+        weekday versus per weekend day</strong> across the
+        selected period and borough.
+      </p>
+
+      <p class="status" id="week-status" aria-live="polite">
+        Loading weekday/weekend data…
+      </p>
+
+      <div class="visualization-card">
+        <div
+          id="week-chart"
+          role="img"
+          aria-label="Weekday versus weekend average daily complaint comparison">
+        </div>
+      </div>
+
       <p class="insight" id="week-insight"></p>
-      <p class="source">Calculated using daily complaint totals and the number of calendar weekdays and weekend days in the selected window. The result describes reporting frequency, not actual noise exposure.</p>
+
+      <p class="source">
+        Calculated using daily complaint totals and the
+        number of calendar weekdays and weekend days in
+        the selected window. The result describes reporting
+        frequency, not actual noise exposure.
+      </p>
     </section>
 
+
+    <!-- CHAPTER 04: NOISE CATEGORIES -->
     <section class="chapter" id="categories">
       <p class="eyebrow">04 / WHAT PEOPLE REPORT</p>
+
       <h2>What's Keeping NYC Awake?</h2>
-      <p class="description">Not every noise complaint has the same source. Residential activity, streets, vehicles, and commercial spaces all appear in 311 data. These bars show the most reported noise categories in your selected borough and period.</p>
-      <p class="status" id="category-status" aria-live="polite">Loading complaint categories…</p>
-      <div class="visualization-card"><div id="category-chart" role="img" aria-label="Top noise complaint categories"></div></div>
+
+      <p class="description">
+        Not every noise complaint has the same source.
+        Residential activity, streets, vehicles, and
+        commercial spaces all appear in 311 data.
+        These bars show the most reported noise
+        categories in your selected borough and period.
+      </p>
+
+      <p class="status" id="category-status" aria-live="polite">
+        Loading complaint categories…
+      </p>
+
+      <div class="visualization-card">
+        <div
+          id="category-chart"
+          role="img"
+          aria-label="Top noise complaint categories">
+        </div>
+      </div>
+
       <p class="insight" id="category-insight"></p>
-      <p class="source">Complaint categories are labels used by NYC 311. The figures are report counts, not verified sources of noise or the number of different incidents.</p>
+
+      <p class="source">
+        Complaint categories are labels used by NYC 311.
+        The figures are report counts, not verified sources
+        of noise or the number of different incidents.
+      </p>
     </section>
 
+
+    <!-- JOURNALISTIC CONCLUSION -->
     <section class="conclusion">
-      <p class="eyebrow">THE QUESTION BEHIND THE NUMBERS</p>
-      <h2>The city never sleeps.<br><em>But who gets to rest?</em></h2>
-      <p>New York's energy is part of its identity. Its 311 records offer another portrait: moments when residents decided the sound around them warranted a complaint.</p>
-      <p>These data can help us ask <strong>when</strong> complaints rise, <strong>where</strong> people report them, and <strong>what kinds</strong> of noise they describe. They cannot tell us how loud each block truly is—or how many people experience noise without ever calling 311.</p>
-      <p class="closing">A complaint is a signal. It isn't the whole soundscape.</p>
-      <a href="#top" class="explore-link">Back to the beginning ↑</a>
+      <p class="eyebrow">
+        THE QUESTION BEHIND THE NUMBERS
+      </p>
+
+      <h2>
+        The city never sleeps.<br>
+        <em>But who gets to rest?</em>
+      </h2>
+
+      <p>
+        New York's energy is part of its identity. Its
+        311 records offer another portrait: moments when
+        residents decided the sound around them warranted
+        a complaint.
+      </p>
+
+      <p>
+        These data can help us ask <strong>when</strong>
+        complaints rise, <strong>where</strong> people
+        report them, and <strong>what kinds</strong>
+        of noise they describe. They cannot tell us how
+        loud each block truly is—or how many people
+        experience noise without ever calling 311.
+      </p>
+
+      <p class="closing">
+        A complaint is a signal.
+        It isn't the whole soundscape.
+      </p>
+
+      <a href="#top" class="explore-link">
+        Back to the beginning ↑
+      </a>
     </section>
 
-    <footer class="site-footer"><strong>The City That Never Sleeps</strong><span>Built with NYC Open Data · D3.js · Leaflet</span><a href="https://data.cityofnewyork.us/resource/erm2-nwe9.json" target="_blank" rel="noopener noreferrer">Source data ↗</a></footer>
+
+    <!-- FOOTER -->
+    <footer class="site-footer">
+      <strong>The City That Never Sleeps</strong>
+
+      <span>
+        Built with NYC Open Data · D3.js · Leaflet
+      </span>
+
+      <a
+        href="https://data.cityofnewyork.us/resource/erm2-nwe9.json"
+        target="_blank"
+        rel="noopener noreferrer">
+        Source data ↗
+      </a>
+    </footer>
+
   </main>
+
+
+  <!-- JAVASCRIPT LIBRARIES -->
   <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- WEBSITE FILES -->
   <script src="script.js"></script>
   <script src="map.js"></script>
   <script src="story.js"></script>
+
 </body>
 </html>
